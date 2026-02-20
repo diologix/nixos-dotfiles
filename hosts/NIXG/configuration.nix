@@ -23,9 +23,5 @@
   ];
 
   # AMD GPU
-  hardware.graphics.extraPackages = with pkgs; [
-    amdvlk
-  ];
-
   boot.kernelModules = [ "amdgpu" ];
 }
