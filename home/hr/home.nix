@@ -24,6 +24,7 @@ in
   programs.git = {
   enable = true;
   userName = "hr";
+  userEmail = "diologix@gmail.com";
   
   extraConfig = {
     init.defaultBranch = "main";
@@ -34,8 +35,6 @@ in
       pager = "delta";  # optional: pretty diff
     };
   };
-
-  delta.enable = true;  # pretty git diff (optional)
 };
 
 
