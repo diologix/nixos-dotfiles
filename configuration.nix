@@ -1,195 +1,147 @@
-{ config, pkgs, ... }:
+{config,pkgs,lib,...}:
 
 {
- imports =
- [
-   ./hardware-configuration.nix
- ];
+ imports=[./hardware-configuration.nix];
 
- #################################################
- ## HOST
- #################################################
- networking.hostName = "nixos-laptop";
- time.timeZone = "Europe/Berlin";
- i18n.defaultLocale = "en_US.UTF-8";
+ nix.settings.experimental-features=["nix-command" "flakes"];
 
- #################################################
- ## BOOT
- #################################################
+ nixpkgs.config.allowUnfree=true;
 
- boot.loader.systemd-boot.enable = true;
- boot.loader.efi.canTouchEfiVariables = true;
- boot.initrd.systemd.enable = true;
+ networking.hostName="nixos-laptop";
+ time.timeZone="Europe/Berlin";
+ i18n.defaultLocale="en_US.UTF-8";
 
- #################################################
- ## TPM LUKS UNLOCK
- #################################################
+ boot.loader.systemd-boot.enable=true;
+ boot.loader.efi.canTouchEfiVariables=true;
+ boot.initrd.systemd.enable=true;
 
- boot.initrd.luks.devices."cryptroot" = {
-   device = "/dev/disk/by-partlabel/luksroot";
-   preLVM = true;
+ boot.initrd.luks.devices.cryptroot={
+  device="/dev/disk/by-partlabel/luksroot";
  };
 
- #################################################
- ## FILESYSTEM
- #################################################
- fileSystems."/" =
- {
-   device = "/dev/mapper/cryptroot";
-   fsType = "xfs";
+ fileSystems."/"={
+  device="/dev/mapper/cryptroot";
+  fsType="xfs";
  };
 
- #################################################
- ## NETWORK
- #################################################
- networking.networkmanager.enable = true;
+ networking.networkmanager.enable=true;
 
- #################################################
- ## USER
- #################################################
- users.users.hr = {
-   isNormalUser = true;
-   extraGroups = [
-     "wheel"
-     "networkmanager"
-     "audio"
-     "video"
-     "input"
-     "wireshark"
-     "kvm"
-     "libvirt-qemu"
-     "libvirt"
-     "storage"
-   ];
-   shell = pkgs.noctalia;
+ users.users.hr={
+  isNormalUser=true;
+  extraGroups=[
+   "wheel"
+   "networkmanager"
+   "libvirtd"
+   "kvm"
+   "audio"
+   "video"
+   "input"
+  ];
+  shell=pkgs.bashInteractive;
  };
 
- security.sudo.wheelNeedsPassword = true;
+ services.getty.autologinUser="hr";
 
- #################################################
- ## LAPTOP
- #################################################
- services.tlp.enable = true;
- services.power-profiles-daemon.enable = true;
- services.upower.enable = true;
- services.fwupd.enable = true;
- hardware.bluetooth.enable = true;
- services.blueman.enable = true;
-
- #################################################
- ## AUDIO
- #################################################
- services.pipewire = {
-   enable = true;
-   alsa.enable = true;
-   pulse.enable = true;
- };
-
- #################################################
- ## HYPRLAND
- #################################################
- programs.hyprland.enable = true;
- services.xserver.enable = true;
- services.xserver.displayManager.startx.enable = true;
-
- #################################################
- ## AUTOLOGIN TTY1
- #################################################
- services.getty.autologinUser = "hr";
- services.getty.helpLine = "";
- services.getty.greetingLine = "";
- programs.bash.loginShellInit = ''
-if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
- exec Hyprland
-fi
- '';
-
- #################################################
- ## SYNCTHING
- #################################################
- services.syncthing = {
-   enable = true;
-   user = "hr";
-   dataDir = "/home/hr";
-   configDir = "/home/hr/.config/syncthing";
- };
-
- #################################################
- ## AUTOSTART PROGRAMS
- #################################################
-
- environment.etc."xdg/autostart/nextcloud.desktop".text = ''
-[Desktop Entry]
-Type=Application
-Exec=${pkgs.nextcloud-client}/bin/nextcloud
-Name=Nextcloud
- '';
-
- environment.etc."xdg/autostart/noctalia.desktop".text = ''
-[Desktop Entry]
-Type=Application
-Exec=${pkgs.noctalia}/bin/noctalia
-Name=noctalia
- '';
-
- #################################################
- ## PORTALS
- #################################################
- xdg.portal = {
-   enable = true;
-   extraPortals =
-     [ pkgs.xdg-desktop-portal-hyprland ];
- };
-
- #################################################
- ## PACKAGES
- #################################################
-
- environment.systemPackages = with pkgs; [
-   git
-   vim
-   wget
-   curl
-   foot
-   wl-clipboard
-   grim
-   slurp
-   mako
-   swaylock-effects
-   brightnessctl
-   powertop
-   thunar
-   nextcloud-client
-   noctalia
- ];
-
- #################################################
- ## FONTS
- #################################################
- fonts.packages = with pkgs; [
-   nerd-fonts.fira-code
- ];
-
- #################################################
- ## WAYLAND
- #################################################
- environment.sessionVariables = {
-   NIXOS_OZONE_WL = "1";
- };
-
-#################################################
-## KVM / LIBVIRT
-#################################################
-virtualisation.libvirtd = {
-  enable = true;
-  qemu = {
-    package = pkgs.qemu_kvm;
-    runAsRoot = false;
-    ovmf.enable = true;   # UEFI VM support
-    swtpm.enable = true;  # TPM inside VMs
+ services.greetd={
+  enable=true;
+  settings={
+   default_session={
+    user="hr";
+    command="${pkgs.hyprland}/bin/Hyprland";
+   };
   };
-};
+ };
 
- #################################################
- system.stateVersion = "24.11";
+ programs.hyprland.enable=true;
+
+ xdg.portal.enable=true;
+ xdg.portal.extraPortals=[pkgs.xdg-desktop-portal-hyprland];
+
+ environment.sessionVariables={
+  NIXOS_OZONE_WL="1";
+ };
+
+ services.pipewire={
+  enable=true;
+  alsa.enable=true;
+  pulse.enable=true;
+ };
+
+ services.tlp.enable=true;
+ services.power-profiles-daemon.enable=true;
+ services.fwupd.enable=true;
+ services.upower.enable=true;
+
+ hardware.bluetooth.enable=true;
+ services.blueman.enable=true;
+
+ security.polkit.enable=true;
+
+ virtualisation.libvirtd={
+  enable=true;
+  onBoot="start";
+  qemu={
+   package=pkgs.qemu_kvm;
+   ovmf.enable=true;
+   swtpm.enable=true;
+   runAsRoot=false;
+  };
+ };
+
+ services.spice-vdagentd.enable=true;
+
+ networking.firewall.trustedInterfaces=["virbr0"];
+
+ boot.kernelModules=[
+  "kvm-intel"
+ ];
+
+ systemd.services.libvirt-default-network={
+  wantedBy=["multi-user.target"];
+  after=["libvirtd.service"];
+  script=''
+   ${pkgs.libvirt}/bin/virsh net-autostart default || true
+   ${pkgs.libvirt}/bin/virsh net-start default || true
+  '';
+  serviceConfig.Type="oneshot";
+ };
+
+ services.syncthing={
+  enable=true;
+  user="hr";
+  dataDir="/home/hr";
+  configDir="/home/hr/.config/syncthing";
+ };
+
+ systemd.user.services.nextcloud-client={
+  description="Nextcloud";
+  wantedBy=["graphical-session.target"];
+  serviceConfig.ExecStart="${pkgs.nextcloud-client}/bin/nextcloud";
+ };
+
+ systemd.user.services.noctalia={
+  description="Noctalia";
+  wantedBy=["graphical-session.target"];
+  serviceConfig.ExecStart="${pkgs.bash}/bin/bash -c ${pkgs.writeShellScript "noctalia-run" ''
+   exec ${pkgs.callPackage (builtins.fetchGit {
+    url="https://github.com/YOURUSER/noctalia.git";
+   }) {}}/bin/noctalia
+  ''}";
+ };
+
+ environment.systemPackages=with pkgs;[
+  git vim wget curl foot thunar
+  wl-clipboard grim slurp mako swaylock-effects
+  brightnessctl powertop
+  virt-manager virt-viewer spice spice-gtk swtpm dnsmasq bridge-utils
+  nextcloud-client
+ ];
+
+ fonts.packages=with pkgs;[
+  nerd-fonts.fira-code
+ ];
+
+ services.fstrim.enable=true;
+
+ system.stateVersion="25.11";
 }
