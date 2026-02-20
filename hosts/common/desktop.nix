@@ -23,11 +23,10 @@
   services.greetd = {
     enable = true;
     settings = {
-      initial_session = {
+      default_session = {
         command = "Hyprland";
         user = "hr";
       };
-      default_session = config.services.greetd.settings.initial_session;
     };
   };
 
@@ -44,7 +43,7 @@
   environment.systemPackages = with pkgs; [
     nextcloud-client
     syncthing
-    network-manager-applet
+    networkmanagerapplet
     blueman
     brightnessctl
     wl-clipboard

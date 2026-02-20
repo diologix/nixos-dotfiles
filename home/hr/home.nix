@@ -13,8 +13,8 @@ in
   home.packages = with pkgs; [
     firefox
     kitty
-    thunar
     neovim
+    nemo-with-extensions
     nextcloud-client
     syncthing
     grim slurp wl-clipboard

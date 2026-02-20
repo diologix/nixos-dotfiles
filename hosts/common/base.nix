@@ -19,7 +19,6 @@
     wget
     curl
     htop
-    neovim
     usbutils
     pciutils
     lm_sensors
