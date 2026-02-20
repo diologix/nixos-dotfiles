@@ -21,7 +21,23 @@ in
   ];
 
   programs.zsh.enable = true;
-  programs.git.enable = true;
+  programs.git = {
+  enable = true;
+  userName = "hr";
+  
+  extraConfig = {
+    init.defaultBranch = "main";
+    pull.rebase = false;
+    push.autoSetupRemote = true;
+    core = {
+      editor = "nvim";
+      pager = "delta";  # optional: pretty diff
+    };
+  };
+
+  delta.enable = true;  # pretty git diff (optional)
+};
+
 
   # Neovim basic config
   programs.neovim = {
@@ -50,8 +66,7 @@ in
         "blueman-applet"
         "nextcloud"
         "syncthing serve --no-browser"
-        "systemctl --user start noctalia-shell.service"
-        "systemctl --user start noctalia-shell" 
+        "noctalia-shell" 
       ];
 
       env = [

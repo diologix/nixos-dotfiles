@@ -13,6 +13,9 @@
 #    pkiBundle = "/etc/secureboot";
 #  };
 # Temporary bootloader for first install
+  boot.initrd.systemd.enable = true;
+  boot.initrd.luks.devices."root".device = "/dev/disk/by-label/NIXOS_CRYPT";
+  boot.initrd.luks.devices."root".preLVM = true;
 
 boot.loader.systemd-boot.enable = true;
 boot.loader.efi.canTouchEfiVariables = true;
@@ -27,7 +30,4 @@ boot.lanzaboote.enable = lib.mkForce false;
     interface = "device";
   };
 
-  boot.initrd.systemd.enable = true;
-  boot.initrd.luks.devices."root".device = "/dev/disk/by-label/NIXOS_CRYPT";
-  boot.initrd.luks.devices."root".preLVM = true;
 }
