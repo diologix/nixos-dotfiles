@@ -1,6 +1,7 @@
 {config,pkgs,lib,...}:
 
 {
+
  imports=[./hardware-configuration.nix];
 
  nix.settings.experimental-features=["nix-command" "flakes"];
@@ -8,11 +9,17 @@
  nixpkgs.config.allowUnfree=true;
 
  networking.hostName="nixos-laptop";
+
  time.timeZone="Europe/Berlin";
+
  i18n.defaultLocale="en_US.UTF-8";
 
- boot.loader.systemd-boot.enable=true;
+ boot.loader.systemd-boot.enable=lib.mkForce false;
+
+ boot.loader.grub.enable=false;
+
  boot.loader.efi.canTouchEfiVariables=true;
+
  boot.initrd.systemd.enable=true;
 
  boot.initrd.luks.devices.cryptroot={
@@ -28,6 +35,7 @@
 
  users.users.hr={
   isNormalUser=true;
+
   extraGroups=[
    "wheel"
    "networkmanager"
@@ -35,27 +43,27 @@
    "kvm"
    "audio"
    "video"
-   "input"
   ];
+
   shell=pkgs.bashInteractive;
  };
 
- services.getty.autologinUser="hr";
-
  services.greetd={
   enable=true;
-  settings={
-   default_session={
-    user="hr";
-    command="${pkgs.hyprland}/bin/Hyprland";
-   };
+
+  settings.default_session={
+   user="hr";
+   command="${pkgs.hyprland}/bin/Hyprland";
   };
  };
 
  programs.hyprland.enable=true;
 
  xdg.portal.enable=true;
- xdg.portal.extraPortals=[pkgs.xdg-desktop-portal-hyprland];
+
+ xdg.portal.extraPortals=[
+  pkgs.xdg-desktop-portal-hyprland
+ ];
 
  environment.sessionVariables={
   NIXOS_OZONE_WL="1";
@@ -68,11 +76,15 @@
  };
 
  services.tlp.enable=true;
+
  services.power-profiles-daemon.enable=true;
+
  services.fwupd.enable=true;
+
  services.upower.enable=true;
 
  hardware.bluetooth.enable=true;
+
  services.blueman.enable=true;
 
  security.polkit.enable=true;
@@ -80,6 +92,7 @@
  virtualisation.libvirtd={
   enable=true;
   onBoot="start";
+
   qemu={
    package=pkgs.qemu_kvm;
    ovmf.enable=true;
@@ -114,15 +127,13 @@
  };
 
  systemd.user.services.nextcloud-client={
-  description="Nextcloud";
   wantedBy=["graphical-session.target"];
   serviceConfig.ExecStart="${pkgs.nextcloud-client}/bin/nextcloud";
  };
 
  systemd.user.services.noctalia={
-  description="Noctalia";
   wantedBy=["graphical-session.target"];
-  serviceConfig.ExecStart="${pkgs.bash}/bin/bash -c ${pkgs.writeShellScript "noctalia-run" ''
+  serviceConfig.ExecStart="${pkgs.writeShellScript "run-noctalia" ''
    exec ${pkgs.callPackage (builtins.fetchGit {
     url="https://github.com/YOURUSER/noctalia.git";
    }) {}}/bin/noctalia
@@ -130,10 +141,13 @@
  };
 
  environment.systemPackages=with pkgs;[
-  git vim wget curl foot thunar
-  wl-clipboard grim slurp mako swaylock-effects
+  git vim wget curl
+  foot thunar
+  wl-clipboard grim slurp
+  mako swaylock-effects
   brightnessctl powertop
-  virt-manager virt-viewer spice spice-gtk swtpm dnsmasq bridge-utils
+  virt-manager virt-viewer spice spice-gtk
+  swtpm dnsmasq bridge-utils
   nextcloud-client
  ];
 
@@ -143,5 +157,19 @@
 
  services.fstrim.enable=true;
 
+ ####################################
+ ## LANZABOOTE
+ ####################################
+
+ boot.lanzaboote={
+  enable=true;
+  pkiBundle="/etc/secureboot";
+ };
+
+ environment.systemPackages=[
+  pkgs.sbctl
+ ];
+
  system.stateVersion="25.11";
+
 }
