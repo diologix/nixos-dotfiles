@@ -26,7 +26,7 @@
           ./hosts/common/base.nix
           ./hosts/common/users.nix
           ./hosts/common/desktop.nix
-          ./hosts/common/virtualisation.nix
+          ./hosts/common/virtualization.nix
           ./hosts/common/lanzaboote.nix
 
           ./hosts/NIXG/configuration.nix
