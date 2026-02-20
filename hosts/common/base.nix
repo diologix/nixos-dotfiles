@@ -25,7 +25,18 @@
     fastfetch
     file
     p7zip
+    brightnessctl
+    pavucontrol
+  ] ++ [
+    (pkgs.writeScriptBin "rebuild" ''
+      #!/usr/bin/env bash
+      cd /home/hr/nixos-dotfiles || { echo "Config dir not found"; exit 1; }
+      sudo nixos-rebuild switch --flake .#$(hostname | sed 's/[^A-Z]*//g')
+    '')
   ];
+
+  # Global shell alias
+  environment.shellAliases.rebuild = "rebuild";
 
   services.openssh.enable = true;
 
@@ -42,3 +53,4 @@
 
   system.stateVersion = "25.11";
 }
+
