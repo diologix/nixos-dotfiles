@@ -1,7 +1,7 @@
 {
  description="Senior Laptop Lanzaboote";
  inputs={
-  nixpkgs.url="github:NixOS/nixpkgs/nixos-24.11";
+  nixpkgs.url="github:NixOS/nixpkgs/nixos-25.11";
 
   lanzaboote.url="github:nix-community/lanzaboote";
   lanzaboote.inputs.nixpkgs.follows="nixpkgs";
