@@ -7,11 +7,20 @@
     sbctl
   ];
 
-  boot.loader.systemd-boot.enable = lib.mkForce false;
-  boot.lanzaboote = {
-    enable = true;
-    pkiBundle = "/etc/secureboot";
-  };
+#  boot.loader.systemd-boot.enable = lib.mkForce false;
+#  boot.lanzaboote = {
+#    enable = true;
+#    pkiBundle = "/etc/secureboot";
+#  };
+# Temporary bootloader for first install
+
+boot.loader.systemd-boot.enable = true;
+boot.loader.efi.canTouchEfiVariables = true;
+boot.loader.efi.efiSysMountPoint = "/boot";  # your EFI partition
+
+# Lanzaboote disabled for now:
+boot.lanzaboote.enable = lib.mkForce false;
+
 
   security.tpm2.enable = true;
   security.tpm2.tctiEnvironment = {

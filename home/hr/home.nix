@@ -13,7 +13,6 @@ in
   home.packages = with pkgs; [
     firefox
     kitty
-    neovim
     nemo-with-extensions
     nextcloud-client
     syncthing
