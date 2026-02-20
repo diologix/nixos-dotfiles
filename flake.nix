@@ -2,8 +2,8 @@
   description = "NIXG + NIXP NixOS with Hyprland, TPM/LUKS/Lanzaboote, Home Manager";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11"; # adjust as needed
-    home-manager.url = "github:nix-community/home-manager/release-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11"; # adjust as needed
+    home-manager.url = "github:nix-community/home-manager/release-25.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     lanzaboote.url = "github:nix-community/lanzaboote";
