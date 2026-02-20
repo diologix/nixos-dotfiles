@@ -17,6 +17,6 @@
   security.tpm2.tctiEnvironment = "device";
 
   boot.initrd.systemd.enable = true;
-  boot.initrd.luks.devices."root".device = "/dev/disk/by-uuid/REPLACE-WITH-YOUR-LUKS-UUID";
+  boot.initrd.luks.devices."root".device = "/dev/disk/by-label/NIXOS_CRYPT";
   boot.initrd.luks.devices."root".preLVM = true;
 }
