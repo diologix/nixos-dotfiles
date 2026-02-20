@@ -1,0 +1,31 @@
+{ config, pkgs, lib, ... }:
+
+{
+  networking.hostName = "NIXG";
+
+  imports = [
+    ./hardware-configuration.nix
+  ];
+
+  # Root filesystem is XFS on LUKS LVM, adjust as needed
+  fileSystems."/" = {
+    device = "/dev/mapper/vg-root";
+    fsType = "xfs";
+  };
+
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-partlabel/EFI";
+    fsType = "vfat";
+  };
+
+  swapDevices = [
+    { device = "/dev/mapper/vg-swap"; }
+  ];
+
+  # AMD GPU
+  hardware.graphics.extraPackages = with pkgs; [
+    amdvlk
+  ];
+
+  boot.kernelModules = [ "amdgpu" ];
+}
