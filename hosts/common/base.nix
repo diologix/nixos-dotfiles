@@ -30,6 +30,8 @@
 
   services.openssh.enable = true;
 
+  programs.zsh.enable = true;
+
   hardware.bluetooth.enable = true;
 
   powerManagement.powertop.enable = true;

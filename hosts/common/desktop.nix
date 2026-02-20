@@ -37,7 +37,8 @@
   # Laptop niceties
   services.upower.enable = true;
   services.acpid.enable = true;
-  services.power-profiles-daemon.enable = true;
+  services.tlp.enable = true;
+  services.power-profiles-daemon.enable = lib.mkForce false;
 
   # Nextcloud desktop + Syncthing
   environment.systemPackages = with pkgs; [

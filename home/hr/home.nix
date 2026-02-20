@@ -18,6 +18,7 @@ in
     nextcloud-client
     syncthing
     grim slurp wl-clipboard
+    (inputs.noctalia.packages.${pkgs.system}.default or inputs.noctalia.defaultPackage.${pkgs.system})
   ];
 
   programs.zsh.enable = true;
@@ -51,6 +52,7 @@ in
         "nextcloud"
         "syncthing serve --no-browser"
         "systemctl --user start noctalia-shell.service"
+        "systemctl --user start noctalia-shell" 
       ];
 
       env = [
@@ -75,18 +77,6 @@ in
   };
 
   # Noctalia Shell via Home Manager. [web:30]
-  services.noctalia-shell = {
-    enable = true;
-    package = noctaliaPkg;
-    config = {
-      # minimal example config; adjust to taste
-      bar = {
-        height = 32;
-        position = "top";
-        modules = [ "workspaces" "window-title" "cpu" "memory" "battery" "clock" "tray" ];
-      };
-    };
-  };
 
   # Enable user systemd for services (Noctalia, etc.).
   systemd.user.startServices = "sd-switch";

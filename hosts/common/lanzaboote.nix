@@ -14,7 +14,9 @@
   };
 
   security.tpm2.enable = true;
-  security.tpm2.tctiEnvironment = "device";
+  security.tpm2.tctiEnvironment = {
+    interface = "device";
+  };
 
   boot.initrd.systemd.enable = true;
   boot.initrd.luks.devices."root".device = "/dev/disk/by-label/NIXOS_CRYPT";
